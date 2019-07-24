@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.Dao.SysRoleMapper">
+  <resultMap id="BaseResultMap" type="com.example.demo.Model.SysRole">
+    <id column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="available" jdbcType="INTEGER" property="available" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="role" jdbcType="VARCHAR" property="role" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    role_id, available, description, role
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from sys_role
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.example.demo.Model.SysRole">
+    insert into sys_role (role_id, available, description, 
+      role)
+    values (#{roleId,jdbcType=VARCHAR}, #{available,jdbcType=INTEGER}, #{description,jdbcType=VARCHAR}, 
+      #{role,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.demo.Model.SysRole">
+    insert into sys_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="available != null">
+        available,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="role != null">
+        role,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+      </if>
+      <if test="available != null">
+        #{available,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        #{role,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.demo.Model.SysRole">
+    update sys_role
+    <set>
+      <if test="available != null">
+        available = #{available,jdbcType=INTEGER},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null">
+        role = #{role,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.demo.Model.SysRole">
+    update sys_role
+    set available = #{available,jdbcType=INTEGER},
+      description = #{description,jdbcType=VARCHAR},
+      role = #{role,jdbcType=VARCHAR}
+    where role_id = #{roleId,jdbcType=VARCHAR}
+  </update>
+
+  <!--自己添加的-->
+  <resultMap id="RolePermissionMap" type="com.example.demo.Model.SysRole">
+    <id column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="available" jdbcType="INTEGER" property="available" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="role" jdbcType="VARCHAR" property="role" />
+    <collection property="permissions" ofType="com.example.demo.Model.SysRolePermissionKey">
+      <id column="permission_id" jdbcType="VARCHAR" property="permissionId" />
+      <id column="role_id" jdbcType="VARCHAR" property="roleId" />
+      <association property="permission" javaType="com.example.demo.Model.SysPermission">
+        <id column="permission_id" jdbcType="VARCHAR" property="permissionId" />
+        <result column="available" jdbcType="INTEGER" property="available" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="parent_id" jdbcType="VARCHAR" property="parentId" />
+        <result column="parent_ids" jdbcType="VARCHAR" property="parentIds" />
+        <result column="permission" jdbcType="VARCHAR" property="permission" />
+        <result column="resource_type" jdbcType="VARCHAR" property="resourceType" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+      </association>
+    </collection>
+  </resultMap>
+
+  <select id="selectRolePermission" parameterType="java.lang.String" resultType="com.example.demo.Model.SysPermission">
+    select sp.permission_id,sp.available,sp.name,sp.parent_id,sp.parent_ids,sp.permission,sp.resource_type,sp.url
+    from sys_role p
+    left join sys_role_permission srp on p.role_id=srp.role_id
+    left join sys_permission sp on srp.permission_id=sp.permission_id where p.role_id=#{roleid}
+   </select>
+</mapper>
